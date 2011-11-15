@@ -1,4 +1,4 @@
-Last.FM Reader		(Development since 2011-10-05)
+Last.FM Track Reader		(Development since 2011-10-05)
 
 ToDo-List:
 		-fix Bugs
