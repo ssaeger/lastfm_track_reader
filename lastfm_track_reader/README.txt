@@ -24,9 +24,9 @@ New Features:
 		-GUI is usable during dataload
 		-includes more exceptions
 
-Bugs:	-bad code								|		improvement with next versions
-		-no exception handling					|		add it ;)
-		-not secure against wrong input			|		add it ;)
+Bugs:		-bad code					|improvement with next versions
+		-no exception handling				|add it ;)
+		-not secure against wrong input			|add it ;)
 
 ------------------------------------------------------
 
@@ -36,9 +36,9 @@ New Features:
 		-you can change Number of Threads between 1-4
 		-code optimized
 
-Bugs:	-bad code								|		improvement with next versions
-		-no exception handling					|		add it ;)
-		-not secure against wrong input			|		add it ;)
+Bugs:		-bad code					|improvement with next versions
+		-no exception handling				|add it ;)
+		-not secure against wrong input			|add it ;)
 
 ------------------------------------------------------
 
@@ -47,9 +47,9 @@ Bugs:	-bad code								|		improvement with next versions
 New Features:
 		-Multithreading (~100% faster = half working time)
 
-Bugs:	-very bad code (but works^^)			|		will be fixed in next version
-		-no exception handling					|		add it ;)
-		-not secure against wrong input			|		add it ;)
+Bugs:		-very bad code (but works^^)			|will be fixed in next version
+		-no exception handling				|add it ;)
+		-not secure against wrong input			|add it ;)
 
 ------------------------------------------------------
 
@@ -59,9 +59,9 @@ New Features:
 		-no more sorting after every new data
 		-code optimized
 
-Bugs:	-maybe can be faster
-		-no exception handling					|		add it ;)
-		-not secure against wrong input			|		add it ;)
+Bugs:		-maybe can be faster
+		-no exception handling				|add it ;)
+		-not secure against wrong input			|add it ;)
 
 ------------------------------------------------------
 
@@ -71,9 +71,9 @@ New Features:
 		-correct playcounts (bug fixed)
 		-correct sorting	(bug fixed)
 
-Bugs:	-maybe can be faster					|		sort vector for better search
-		-no exception handling					|		add it ;)
-		-not secure against wrong input			|		add it ;)
+Bugs:		-maybe can be faster				|sort vector for better search
+		-no exception handling				|add it ;)
+		-not secure against wrong input			|add it ;)
 
 ------------------------------------------------------
 
@@ -84,11 +84,11 @@ New Features:
 		-little faster (sorted vector with binary search)
 		-detect number of pages automatically
 
-Bugs:	-small differences in playcount
-		-maybe can be faster					|		sort vector for better search
-		-wrong sorting							|		use sorted vector
-		-no exception handling					|		add it ;)
-		-not secure against wrong input			|		add it ;)
+Bugs:		-small differences in playcount
+		-maybe can be faster				|sort vector for better search
+		-wrong sorting					|use sorted vector
+		-no exception handling				|add it ;)
+		-not secure against wrong input			|add it ;)
 
 ------------------------------------------------------
 
@@ -99,8 +99,8 @@ New Features:
 		-Show tracklist in table
 		-GUI
 
-Bugs:	-differences in playcount
-		-slow data adding						|		sort vector for better search
-		-wrong sorting							|		use sorted vector
-		-no exception handling					|		add it ;)
-		-not secure against wrong input			|		add it ;)
+Bugs:		-differences in playcount
+		-slow data adding				|sort vector for better search
+		-wrong sorting					|use sorted vector
+		-no exception handling				|add it ;)
+		-not secure against wrong input			|add it ;)
