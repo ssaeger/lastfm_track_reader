@@ -12,6 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
@@ -67,101 +68,128 @@ class Parser {
 
 		return connection;
 	}
+	
+	public void parseInterpret(XPath xPathEvaluator, Document document, TrackContainer aTrackContainer) {
+		try {
+			XPathExpression nameExpr = xPathEvaluator.compile("lfm/recenttracks/track/artist");
+			NodeList nameNodes = (NodeList) nameExpr.evaluate(document,
+					XPathConstants.NODESET);
+		
+			for (int i = 0; i < nameNodes.getLength(); i++) {
+				Node nameNode = nameNodes.item(i);
+				getTmpTrack().setInterpret(
+						String.format(nameNode.getTextContent()));
+				parseTrack(xPathEvaluator, nameNode);
+				parseAlbum(xPathEvaluator, nameNode);
+				parseDate(xPathEvaluator, nameNode);
+				addTmpTrack(aTrackContainer);
+			}
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void parseTrack(XPath xPathEvaluator, Node nameNode) {
+		try {
+			XPathExpression nameExpr = xPathEvaluator.compile("following-sibling::name");
+			NodeList trackNameNodes = (NodeList) nameExpr.evaluate(nameNode,
+					XPathConstants.NODESET);
+		
+			for (int j = 0; j < trackNameNodes.getLength(); j++) {
+				getTmpTrack().setName(
+						String.format(trackNameNodes.item(j)
+								.getTextContent()));
+			}
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void parseAlbum(XPath xPathEvaluator, Node nameNode) {
+		try {
+			XPathExpression albumNameExpr = xPathEvaluator
+					.compile("following-sibling::album");
+		
+			NodeList albumNameNodes = (NodeList) albumNameExpr.evaluate(nameNode,
+					XPathConstants.NODESET);
+			for (int j = 0; j < albumNameNodes.getLength(); j++) {
+				getTmpTrack().setAlbum(
+						String.format(albumNameNodes.item(j)
+								.getTextContent().replaceAll("%", "")));
+			}
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void parseDate(XPath xPathEvaluator, Node nameNode) {
+		try {
+			XPathExpression trackDateExpr = xPathEvaluator
+					.compile("following-sibling::date");
+		
+			NodeList trackDateNodes = (NodeList) trackDateExpr.evaluate(nameNode,
+					XPathConstants.NODESET);
+			for (int j = 0; j < trackDateNodes.getLength(); j++) {
+				String s = String.format(trackDateNodes.item(j).getTextContent())
+						.replace(" Jan ", ".01.").replace(" Feb ", ".02.")
+						.replace(" Mar ", ".03.").replace(" Apr ", ".04.")
+						.replace(" May ", ".05.").replace(" Jun ", ".06.")
+						.replace(" Jul ", ".07.").replace(" Aug ", ".08.")
+						.replace(" Sep ", ".09.").replace(" Oct ", ".10.")
+						.replace(" Nov ", ".11.").replace(" Dec ", ".12.")
+						.replace(",", "");
+	
+				StringBuffer sb = new StringBuffer();
+				if (s.length() == 15)
+					sb.append("0");
+				for (int index = 0; index < s.length(); index++)
+					sb.append(s.charAt(index));
+				s = sb.toString();
+				sb.delete(0, sb.length());
+				sb.append(s.substring(6, 10));
+				sb.append(s.substring(2, 5));
+				sb.append('.');
+				sb.append(s.substring(0, 2));
+				sb.append(s.substring(10, 16));
+	
+				s = sb.toString();
+			
+				getTmpTrack().setDate(s);
+			}
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void addTmpTrack(TrackContainer aTrackContainer) {
+		// Binäre Suche um Album zusuchen
+		int x = aTrackContainer.binarySearch(getTmpTrack().getName(),
+				getTmpTrack().getAlbum(), getTmpTrack().getInterpret(),
+				getTmpTrack().getDate());
+		// Track auf Album suchen (Linear)
+		if (x >= 0)
+			x = aTrackContainer.linearSearch(x,
+					getTmpTrack().getName(), getTmpTrack().getAlbum(),
+					getTmpTrack().getInterpret(), getTmpTrack()
+							.getDate());
+	}
 
 	public void parseData(TrackContainer aTrackContainer,
 			URLConnection connection) throws Exception {
 		DocumentBuilder db;
 		XPath xPathEvaluator;
-		XPathExpression nameExpr;
-		NodeList nameNodes;
-		Node nameNode;
-		NodeList trackNameNodes;
-		XPathExpression albumNameExpr;
-		NodeList albumNameNodes;
-		XPathExpression trackDateExpr;
-		NodeList trackDateNodes;
-		String s;
-
 		try {
 			db = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
 
 			final Document document = db.parse(connection.getInputStream());
 			xPathEvaluator = XPATH_FACTORY.newXPath();
 			lock.lock();
-			// Interpret
-			nameExpr = xPathEvaluator.compile("lfm/recenttracks/track/artist");
-			nameNodes = (NodeList) nameExpr.evaluate(document,
-					XPathConstants.NODESET);
-			for (int i = 0; i < nameNodes.getLength(); i++) {
-				nameNode = nameNodes.item(i);
-				getTmpTrack().setInterpret(
-						String.format(nameNode.getTextContent()));
-
-				// Titel
-				nameExpr = xPathEvaluator.compile("following-sibling::name");
-				trackNameNodes = (NodeList) nameExpr.evaluate(nameNode,
-						XPathConstants.NODESET);
-				for (int j = 0; j < trackNameNodes.getLength(); j++)
-					getTmpTrack().setName(
-							String.format(trackNameNodes.item(j)
-									.getTextContent()));
-
-				// Album
-				albumNameExpr = xPathEvaluator
-						.compile("following-sibling::album");
-				albumNameNodes = (NodeList) albumNameExpr.evaluate(nameNode,
-						XPathConstants.NODESET);
-				for (int j = 0; j < albumNameNodes.getLength(); j++)
-					getTmpTrack().setAlbum(
-							String.format(albumNameNodes.item(j)
-									.getTextContent().replaceAll("%", "")));
-
-				// Date
-				trackDateExpr = xPathEvaluator
-						.compile("following-sibling::date");
-				trackDateNodes = (NodeList) trackDateExpr.evaluate(nameNode,
-						XPathConstants.NODESET);
-				for (int j = 0; j < trackDateNodes.getLength(); j++) {
-					s = String.format(trackDateNodes.item(j).getTextContent())
-							.replace(" Jan ", ".01.").replace(" Feb ", ".02.")
-							.replace(" Mar ", ".03.").replace(" Apr ", ".04.")
-							.replace(" May ", ".05.").replace(" Jun ", ".06.")
-							.replace(" Jul ", ".07.").replace(" Aug ", ".08.")
-							.replace(" Sep ", ".09.").replace(" Oct ", ".10.")
-							.replace(" Nov ", ".11.").replace(" Dec ", ".12.")
-							.replace(",", "");
-
-					StringBuffer sb = new StringBuffer();
-					if (s.length() == 15)
-						sb.append("0");
-					for (int index = 0; index < s.length(); index++)
-						sb.append(s.charAt(index));
-					s = sb.toString();
-					sb.delete(0, sb.length());
-					sb.append(s.substring(6, 10));
-					sb.append(s.substring(2, 5));
-					sb.append('.');
-					sb.append(s.substring(0, 2));
-					sb.append(s.substring(10, 16));
-
-					s = sb.toString();
-
-					getTmpTrack().setDate(s);
-				}
-
-				// Binäre Suche um Album zusuchen
-				int x = aTrackContainer.binarySearch(getTmpTrack().getName(),
-						getTmpTrack().getAlbum(), getTmpTrack().getInterpret(),
-						getTmpTrack().getDate());
-				// Track auf Album suchen (Linear)
-				if (x >= 0)
-					x = aTrackContainer.linearSearch(x,
-							getTmpTrack().getName(), getTmpTrack().getAlbum(),
-							getTmpTrack().getInterpret(), getTmpTrack()
-									.getDate());
-			}
+			parseInterpret(xPathEvaluator, document, aTrackContainer);
 			lock.unlock();
-
 		} catch (Exception e) {
 			LastfmReaderGUI.changeStatus(e.toString());
 		}
